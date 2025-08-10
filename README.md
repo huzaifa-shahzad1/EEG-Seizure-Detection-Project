@@ -5,7 +5,7 @@ This project builds a full pipeline to **download**, **process**, and **model** 
 ---
 
 ## 📂 Project Structure
-
+```
 eeg_seizure_project/
 ├── data/
 │ ├── raw/ # downloaded EDF files (per patient)
@@ -48,12 +48,7 @@ eeg_seizure_project/
 ├── requirements.txt # Python dependencies
 ├── README.md
 └── .gitignore
-
-yaml
-Copy
-Edit
-
----
+```
 
 ## ⚙️ Installation
 
@@ -63,13 +58,17 @@ Edit
    cd eeg_seizure_project
 
 ## Create and activate virtual environment
-python -m venv venv
-source venv/bin/activate     # Linux/Mac
-venv\Scripts\activate        # Windows
+   ```bash
+   python -m venv venv
+   source venv/bin/activate     # Linux/Mac
+   venv\Scripts\activate        # Windows
+   ```
 
 ## Install dependencies
 
-pip install -r requirements.txt
+```bash
+   pip install -r requirements.txt
+```
 
 
 ## 🚀 Pipeline Workflow
