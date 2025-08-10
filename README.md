@@ -8,34 +8,34 @@ This project builds a full pipeline to **download**, **process**, and **model** 
 ```
 eeg_seizure_project/
 ├── data/
-│ ├── raw/ # downloaded EDF files (per patient)
+│ ├── raw/ 
 │ │ ├── chb01/
 │ │ ├── chb02/
 │ │ └── ...
-│ ├── features/ # generated feature CSV(s)
+│ ├── features/ 
 │ │ └── eeg_features.csv
-│ ├── processed/ # optional: intermediate npz / segments etc.
-│ └── external/ # optional: external files / metadata
+│ ├── processed/ 
+│ └── external/ 
 │
 ├── db/
-│ ├── init.sql # DB schema / table creation scripts
-│ └── queries/ # useful SQL queries
+│ ├── init.sql 
+│ └── queries/ 
 │
 ├── notebooks/
 │ ├── 01_exploration.ipynb
 │ └── 02_model_prototyping.ipynb
 │
 ├── scripts/
-│ ├── extract_edf.py # downloads EDFs and writes seizure_file_list.txt
-│ ├── extract_features.py # preprocess, segment, extract features, balance dataset
-│ ├── load_to_postgres.py # loads features CSV into local PostgreSQL
-│ ├── train_model.py # train classifier (reads CSV or DB)
-│ ├── evaluate_model.py # evaluate model and save metrics/plots
-│ ├── utils.py # helper functions (e.g., parsers, feature extraction)
+│ ├── extract_edf.py 
+│ ├── extract_features.py 
+│ ├── load_to_postgres.py 
+│ ├── train_model.py 
+│ ├── evaluate_model.py 
+│ ├── utils.py 
 │ └── preprocess.py (optional) # separate preprocessing if needed
 │
 ├── models/
-│ └── model_v1.pkl # saved trained model(s)
+│ └── model_v1.pkl 
 │
 ├── tests/
 │ └── test_feature_extraction.py
@@ -45,10 +45,91 @@ eeg_seizure_project/
 │
 ├── logs/ # pipeline run logs
 │
-├── requirements.txt # Python dependencies
+├── requirements.txt 
 ├── README.md
 └── .gitignore
 ```
+## 📌 Files to Use & Their Purpose
+
+This section outlines **exactly** which files are part of the working pipeline and how they are used.
+
+---
+
+### 1️⃣ Data Download
+- **`scripts/extract_edf.py`**
+  - Downloads **all EDF files** for selected patients.
+  - Saves them under `data/raw/<patient_id>/`.
+  - Also generates a `seizure_file_list.txt` mapping file → seizure label.
+  - **Run first** to ensure all raw data is available.
+
+---
+
+### 2️⃣ Feature Extraction & Preprocessing
+- **`scripts/extract_features.py`**
+  - Reads EDF files from `data/raw/`.
+  - Handles **duplicate channel names**.
+  - Segments signals into fixed-length windows (balanced for seizure/non-seizure).
+  - Extracts statistical & spectral EEG features.
+  - Outputs **model-ready CSV** at `data/features/eeg_features.csv`.
+
+---
+
+### 3️⃣ Database Storage
+- **`scripts/load_to_postgres.py`**
+  - Loads `data/features/eeg_features.csv` into local PostgreSQL.
+  - Adds a `patient_id` column automatically.
+  - Replaces existing table in DB.
+
+---
+
+### 4️⃣ Model Training
+- **`scripts/train_model.py`**
+  - Reads data from CSV **or** PostgreSQL.
+  - Trains classifier to detect seizures.
+  - Saves trained model into `models/model_v1.pkl`.
+
+---
+
+### 5️⃣ Model Evaluation
+- **`scripts/evaluate_model.py`**
+  - Loads trained model from `models/`.
+  - Runs evaluation on test set.
+  - Outputs metrics and plots (ROC, confusion matrix) to `logs/` or `notebooks/`.
+
+---
+
+### 6️⃣ Utilities
+- **`scripts/utils.py`**
+  - Contains helper functions for:
+    - Feature extraction
+    - Signal preprocessing
+    - File parsing
+
+---
+
+### 7️⃣ Configuration
+- **`configs/config.yaml`**
+  - Central place for:
+    - Paths to data
+    - DB credentials
+    - Feature extraction parameters
+    - Window length for segmentation
+
+---
+
+### 8️⃣ Optional Supporting Files
+- **`notebooks/01_exploration.ipynb`**
+  - For initial dataset exploration.
+- **`notebooks/02_model_prototyping.ipynb`**
+  - For quick testing of models before adding to main pipeline.
+- **`db/init.sql`**
+  - SQL script to create database schema if needed.
+- **`tests/test_feature_extraction.py`**
+  - Unit tests for feature extraction functions.
+
+---
+
+
 
 ## ⚙️ Installation
 
