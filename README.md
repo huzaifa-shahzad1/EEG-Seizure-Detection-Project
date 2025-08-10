@@ -65,106 +65,81 @@ eeg_seizure_project/
    ```
 
 ## Install dependencies
-
-```bash
-   pip install -r requirements.txt
-```
+   ```bash
+      pip install -r requirements.txt
+   ```
 
 
 ## 🚀 Pipeline Workflow
 
-1️⃣ Download EEG Data
+### 1️⃣ Download EEG Data
 Run the script to download EDF files for selected patients:
-
-bash
-Copy
-Edit
+```bash
 python scripts/extract_edf.py
-Downloads EDF files into data/raw/<patient_id>/.
+```
+- Downloads EDF files into ```data/raw/<patient_id>/```.
+- Creates data/raw/seizure_file_list.txt marking each file as SEIZURE or NO_SEIZURE.
 
-Creates data/raw/seizure_file_list.txt marking each file as SEIZURE or NO_SEIZURE.
-
-2️⃣ Extract Features
+### 2️⃣ Extract Features
 Generate features from EEG files:
-
-bash
-Copy
-Edit
+```bash
 python scripts/extract_features.py
-Loads EDF files, handles duplicate channels.
+```
+- Loads EDF files, handles duplicate channels.
+- Segments EEG into fixed windows (e.g., 10 seconds).
+- Extracts statistical + spectral features.
+- Balances dataset (equal seizure / non-seizure samples).
+- Saves output to data/features/eeg_features.csv.
 
-Segments EEG into fixed windows (e.g., 10 seconds).
-
-Extracts statistical + spectral features.
-
-Balances dataset (equal seizure / non-seizure samples).
-
-Saves output to data/features/eeg_features.csv.
-
-3️⃣ Load Features into PostgreSQL
+### 3️⃣ Load Features into PostgreSQL
 Load processed CSV into local PostgreSQL:
-
+```bash
 python scripts/load_to_postgres.py
-Creates table eeg_features in local DB.
+```
+- Creates table eeg_features in local DB.
+- Adds patient_id column.
 
-Adds patient_id column.
-
-4️⃣ Train Model
+### 4️⃣ Train Model
 Train a classifier using extracted features:
-
+```bash
 python scripts/train_model.py
-Reads from CSV or DB.
+```
+- Reads from CSV or DB.
+- Splits into train/test.
+- Saves trained model to models/.
 
-Splits into train/test.
-
-Saves trained model to models/.
-
-5️⃣ Evaluate Model
+### 5️⃣ Evaluate Model
 Run evaluation:
+```bash
+   python scripts/evaluate_model.py
+```
+- Generates metrics (accuracy, recall, etc.).
+- Saves plots to logs/ folder.
 
-python scripts/evaluate_model.py
-Generates metrics (accuracy, recall, etc.).
+## 📊 Features Extracted
+- **Statistical**: Mean, Median, Variance, Standard Deviation, Skewness, Kurtosis
+- **Spectral**: Bandpower in delta, theta, alpha, beta, gamma ranges
+- **Information-theoretic**: Signal Entropy
 
-Saves plots to logs/ folder.
-
-📊 Features Extracted
-Statistical: Mean, Median, Variance, Standard Deviation, Skewness, Kurtosis
-
-Spectral: Bandpower in delta, theta, alpha, beta, gamma ranges
-
-Information-theoretic: Signal Entropy
-
-🛠 Requirements
-Python: 3.9+
-
-PostgreSQL: Default localhost:5432, user postgres
-
-Libraries:
-
+## 🛠 Requirements
+- Python: 3.9+
+- PostgreSQL: Default localhost:5432, user postgres
+- Libraries:
+```bash 
 mne
-
 pandas
-
 numpy
-
 scipy
-
 scikit-learn
-
 sqlalchemy
-
 psycopg2
+```
 
-✨ Notes
+### ✨ Notes
 EEG data is sensitive medical data — use ethically and follow PhysioNet terms.
-
 Modify configs/config.yaml to change:
-
-Patients to download
-
-Segment length
-
-Features to extract
-
-Database credentials
+- Patients to download
+- Segment length
+- Features to extract
+- Database credentials
 
